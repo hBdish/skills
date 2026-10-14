@@ -1,111 +1,253 @@
 # Skills
 
-Личный репозиторий agent skills: один источник — любые проекты, любые агенты, любая ОС.
+Скиллы для ИИ-агентов, которые пишут код (Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot и др.). Они учат агента писать и ревьюить код по нашим правилам: Go — по Google Go Style Guide, React — по правилам конкретного проекта.
 
-Скилл — каталог с `SKILL.md` по открытому стандарту [Agent Skills](https://agentskills.io/specification). Его понимают Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, OpenCode, Amp, Cline, Goose, Junie, Kiro, Roo, Windsurf и др. Для агентов без поддержки скиллов есть индекс в `AGENTS.md`.
+- [Зачем это](#зачем-это)
+- [Какие скиллы есть](#какие-скиллы-есть)
+- [Быстрый старт](#быстрый-старт)
+- [Как пользоваться: примеры](#как-пользоваться-примеры)
+- [Как задать правила своего проекта](#как-задать-правила-своего-проекта)
+- [Установка подробно](#установка-подробно)
+- [Обновление и удаление](#обновление-и-удаление)
+- [Если не работает](#если-не-работает)
+- [Добавить или изменить скилл](#добавить-или-изменить-скилл)
 
-## Структура
+## Зачем это
 
-```
-skills/<группа>/<имя>/        единственный источник правды
-  SKILL.md                    frontmatter (name, description) + процедура
-  references/                 детали, читаются по требованию
-  scripts/                    детерминированные проверки (Python, stdlib)
-  evals/                      trigger-evals.json + evals.json
-profiles.json                 наборы скиллов для установки
-templates/skill/              шаблон нового скилла
-scripts/
-  install.py                  установка в проект / глобально, для любых агентов
-  validate.py                 проверка по спецификации и конвенциям репо
-  new_skill.py                создать скилл из шаблона
-```
+Без инструкций агент пишет «в среднем по интернету»: `GetUserId()` вместо `UserID()` в Go, `useEffect` для производного состояния в React, Tailwind в проекте на styled-components. Каждый раз объяснять правила в промпте долго, и все объясняют по-разному.
 
-Группы — для людей: `lang` (правила конкретного языка), `framework` (фреймворки поверх языка), `practice` (процесс вне языка: ревью, коммиты, тесты), `tooling` (инфраструктура), `meta` (работа со скиллами). Агент видит плоское пространство имён, поэтому имя скилла уникально по всему репозиторию.
+Скилл — папка с инструкцией (`SKILL.md`), справочниками и скриптами проверок. Агент всегда видит только короткое описание каждого скилла и сам подгружает нужный, когда задача подходит: пишете Go — подключается `go-style`, правите React-компонент — `react-style`. Полная инструкция не висит в контексте постоянно и не мешает другим задачам.
 
-## Скиллы
+Формат — открытый стандарт [Agent Skills](https://agentskills.io/specification), поэтому одни и те же скиллы работают в разных агентах и на macOS, Linux и Windows.
 
-| Скилл | Что делает | Откуда правила |
+## Какие скиллы есть
+
+| Скилл | Когда срабатывает | Что делает | Откуда правила |
+|---|---|---|---|
+| `go-style` | пишете, правите или ревьюите Go-код | применяет Google Go Style Guide; запускает gofmt, go vet, staticcheck, golangci-lint | [Google Go Style Guide](https://google.github.io/styleguide/go/) |
+| `react-style` | компоненты, хуки, JSX на TS или JS (Next.js, Vite, Remix, React Native) | сначала собирает правила вашего проекта, пишет и ревьюит по ним | ваш проект → умолчания современного React |
+| `typescript-style` | TS-код вне компонентов: утилиты, сервисы, типы | строгая типизация, обработка ошибок, null | конфиги проекта → умолчания |
+| `python-style` | Python-код | типизация, исключения, логирование, нейминг; запускает ruff и mypy | конфиги проекта → умолчания |
+| `skill-authoring` | просите агента создать или поправить скилл | помогает писать новые скиллы для этого репозитория | — |
+
+Скиллы ставятся **профилями**, а не все сразу:
+
+| Профиль | Скиллы | Для кого |
 |---|---|---|
-| [go-style](skills/lang/go-style/SKILL.md) | Google Go Style Guide: принципы, decisions, best practices; проверки gofmt, go vet, staticcheck, golangci-lint | [google.github.io/styleguide/go](https://google.github.io/styleguide/go/), синк 2026-09-07 |
-| [react-style](skills/framework/react-style/SKILL.md) | React на TS/JS: сначала собирает правила проекта (`scripts/conventions.py`), умолчания — только где проект молчит | правила проекта → конфиги → паттерны в коде → умолчания |
-| [typescript-style](skills/lang/typescript-style/SKILL.md) | Типизация и идиомы TS вне компонентов | конфиги проекта → умолчания |
-| [python-style](skills/lang/python-style/SKILL.md) | Типизация, ошибки, логирование, нейминг | конфиги проекта → умолчания |
-| [skill-authoring](skills/meta/skill-authoring/SKILL.md) | Как писать скиллы для этого репозитория | — |
+| `go` | go-style | Go-бэкенд |
+| `react` | react-style, typescript-style | фронтенд на React |
+| `typescript` | typescript-style | TS без React (Node, библиотеки) |
+| `python` | python-style | Python |
+| `fullstack` | go-style, python-style, react-style, typescript-style | монорепы |
+| `authors` | skill-authoring | тем, кто пишет скиллы |
 
-Правила форматирования и написания кода в скиллах делятся на два типа. Механические вещи (отступы, кавычки, порядок импортов) скилл не диктует: он запускает форматтер и линтер проекта и подчиняется их конфигу. Остальное (нейминг, обработка ошибок, структура, идиомы) описано текстом в `SKILL.md` и `references/`. Скилл срабатывает по решению модели, поэтому то, что должно соблюдаться всегда, дублируйте в линтере и CI проекта.
+Почему не все сразу: описания всех установленных скиллов лежат в контексте агента на каждом запросе. Python-скилл в React-проекте — лишние токены и ложные срабатывания.
 
-## Установка
+## Быстрый старт
 
-Нужен только Python 3.8+ (подходит системный `python3` на macOS; на Windows — `py -3` или `python`).
+Нужны git и Python 3.8+. Ничего больше ставить не нужно: на macOS подойдёт встроенный `python3`, на Windows — `py` из установщика python.org.
 
-```bash
-git clone <url> ~/skills
-```
-
-```bash
-python3 ~/skills/scripts/install.py --list
-```
-
-В проект (запускать из корня проекта или указать `--project`):
+**1. Склонируйте репозиторий один раз** (в любое место, ниже — `~/skills`):
 
 ```bash
-python3 ~/skills/scripts/install.py --profile python
+git clone https://github.com/hBdish/skills.git ~/skills
 ```
+
+**2. Установите профиль в проект.** Из корня проекта:
 
 ```bash
-python3 ~/skills/scripts/install.py --profile fullstack --project ~/work/api --agents-md
+python3 ~/skills/scripts/install.py --profile react
 ```
 
-Глобально, для всех проектов:
+Windows (PowerShell), если клонировали в `$HOME\skills`:
+
+```powershell
+py $HOME\skills\scripts\install.py --profile react
+```
+
+Скрипт создаст ссылки на скиллы в `.agents/skills/` (их читают Codex, Cursor, Gemini CLI, Copilot, OpenCode и др.) и в `.claude/skills/` (Claude Code). Сами файлы остаются в `~/skills`.
+
+**3. Добавьте каталоги в `.gitignore` проекта.** Ссылки указывают на путь на вашей машине, коллегам они не нужны:
+
+```gitignore
+.agents/skills/
+.claude/skills/
+```
+
+**4. Перезапустите агента и проверьте.** Спросите его: «какие скиллы тебе доступны?» — в списке должны быть `react-style` и `typescript-style`. Как вызвать скилл явно:
+
+| Агент | Как вызвать |
+|---|---|
+| Claude Code | `/react-style` |
+| Codex | `$react-style` (список — `/skills`) |
+| Остальные | напишите в сообщении «используй react-style» |
+
+Обычно явно вызывать не нужно: агент подключает скилл сам, когда задача подходит.
+
+## Как пользоваться: примеры
+
+Пишите агенту как обычно, упоминать скилл не нужно.
+
+### Новый компонент в React-проекте
+
+> Сделай компонент QuantityStepper (минус / число / плюс) и тест к нему
+
+Что сделает агент с `react-style`:
+
+1. Запустит `scripts/conventions.py` и узнает правила проекта, например:
+   ```
+   RULE DOCS: AGENTS.md
+   styling: styled-components   state/data: Zustand   tests: Vitest, Testing Library
+   file naming: kebab-case folder/index   exports: default export
+   component declaration: arrow function   props typing: interface
+   ```
+2. Прочитает `AGENTS.md` проекта и откроет соседний компонент как образец.
+3. Создаст `src/components/quantity-stepper/index.tsx` и `styles.ts` в том же стиле, что и соседние компоненты, плюс тест на Testing Library.
+4. Прогонит tsc, ESLint и Prettier проекта и скажет, если что-то из них не запустилось.
+
+Без скилла агент с большой вероятностью выбрал бы свои привычки: named export, Tailwind или CSS-модули, тест рядом с файлом.
+
+### Ревью Go-кода
+
+> Посмотри handler.go перед PR
+
+Агент запустит проверки и выдаст замечания по важности: сначала ошибки и безопасность, потом нейминг и стиль. Пример замечания:
+
+```
+[high] in-band error — handler.go:44
+  current: func (h *UserHandler) LookupAge(id string) int { ... return -1 }
+  fix:     func (h *UserHandler) LookupAge(ctx context.Context, id string) (int, error)
+  why:     -1 легко принять за настоящий возраст; ошибка должна быть отдельным значением
+```
+
+В конце агент перечислит проверки, которые не запустились (например, `goimports: not installed`). Значит, эта часть не проверена, а не «всё чисто».
+
+### Вопросы по правилам
+
+> Тут нужен %w или %v? Ошибка из pgx уходит наверх в хендлер
+>
+> useEffect здесь нужен? Он пересчитывает total, когда меняются items
+>
+> Как назвать пакет, который читает и валидирует конфиги?
+
+Агент ответит по правилам из скилла и укажет, откуда правило: Google Go Style Guide или правила вашего проекта.
+
+### Отключить стиль на одну задачу
+
+> Не трогай стиль, у нас фриз. Найди, почему воркер обрабатывает сообщение дважды
+
+Агент займётся только багом, без замечаний по стилю.
+
+## Как задать правила своего проекта
+
+`react-style` (и частично остальные скиллы) подчиняется правилам проекта в таком порядке:
+
+1. **Документы с правилами**: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, `docs/conventions/`.
+2. **Конфиги**: ESLint, Prettier/Biome, tsconfig, `.golangci.yml`, `pyproject.toml`.
+3. **Существующий код**: как уже написаны соседние файлы.
+4. **Умолчания скилла** — только там, где проект молчит.
+
+Хотите, чтобы агент всегда делал по-вашему — напишите это в `AGENTS.md` в корне проекта. Пример:
+
+```markdown
+## Code conventions
+
+- One component per folder: `src/components/<kebab-name>/index.tsx`, styles in `styles.ts` next to it.
+- Components are arrow functions with a default export.
+- Props are declared as `interface <Name>Props`.
+- Styling only via styled-components; no inline `style={{}}`, no CSS files.
+- Global client state lives in zustand stores under `src/store/`; no React Context for shared state.
+- Tests go in `src/components/__tests__/<kebab-name>.test.tsx`, using Testing Library + user-event.
+```
+
+Посмотреть, что скилл видит в вашем проекте, можно и самому:
 
 ```bash
-python3 ~/skills/scripts/install.py --profile everyone --global
+python3 ~/skills/skills/framework/react-style/scripts/conventions.py .
 ```
 
-По умолчанию ставится в `.agents/skills/` (общий каталог Codex, Cursor, Gemini CLI, Copilot, OpenCode, Amp и др.) и `.claude/skills/`. Другие агенты — через `--agent` (`--list` покажет все). `--agents-md` дописывает в `AGENTS.md` проекта индекс установленных скиллов для агентов, которые читают только `AGENTS.md`.
+Механическое форматирование (отступы, кавычки, порядок импортов) скиллы не диктуют: они запускают форматтер и линтер проекта. Скилл срабатывает по решению модели, а не всегда, поэтому то, что должно соблюдаться железно, должно проверяться ещё и линтером в CI.
+
+## Установка подробно
+
+Все варианты:
+
+```bash
+python3 ~/skills/scripts/install.py --list                                 # скиллы, профили, агенты
+python3 ~/skills/scripts/install.py --profile go                           # в текущий проект
+python3 ~/skills/scripts/install.py --profile react --project ~/work/shop  # в другой проект
+python3 ~/skills/scripts/install.py --profile go --profile python          # несколько профилей
+python3 ~/skills/scripts/install.py --skill go-style                       # один скилл
+python3 ~/skills/scripts/install.py --profile react --agent claude         # только для Claude Code
+python3 ~/skills/scripts/install.py --profile react --agents-md            # + список скиллов в AGENTS.md
+python3 ~/skills/scripts/install.py --profile authors --global             # для всех проектов сразу
+python3 ~/skills/scripts/install.py --profile react --copy                 # копии вместо ссылок
+python3 ~/skills/scripts/install.py --profile react --dry-run              # показать план, ничего не менять
+```
+
+| Флаг | Когда нужен |
+|---|---|
+| `--agent <name>` | ставить не в агентов по умолчанию (`universal` + `claude`). Полный список — `--list`: windsurf, kiro, roo, junie, goose и др. |
+| `--global` | скилл нужен во всех проектах (ставится в `~/.agents/skills`, `~/.claude/skills`). Языковые скиллы лучше ставить в проект. |
+| `--agents-md` | агент не умеет скиллы, но читает `AGENTS.md`. Скрипт допишет туда список скиллов, и агент будет открывать их сам. Повторный запуск обновляет список, ваш текст не трогается. |
+| `--copy` | CI, Docker, devcontainer, или вы хотите закоммитить скиллы в проект, чтобы они были у всей команды без клонирования этого репозитория. |
 
 Как это работает на разных ОС:
 
-| ОС | Как ставится | Обновление |
-|---|---|---|
-| macOS / Linux | symlink на каталог в репозитории | `git pull` в репозитории — и всё |
-| Windows | symlink (если включён Developer Mode), иначе junction (админ не нужен), иначе копия | `git pull`; для копий — повторить `install.py` |
-| CI, контейнеры, песочницы | `--copy` | повторить `install.py` |
+| ОС | Как ставится |
+|---|---|
+| macOS, Linux | символическая ссылка на папку в `~/skills` |
+| Windows | символическая ссылка (если включён Developer Mode), иначе junction (админ не нужен), иначе копия |
 
-Установщик не трогает каталоги, которые создал не он (`--force` чтобы заменить), и отказывается ставить в сам репозиторий скиллов. `--uninstall` удаляет только своё; `--dry-run` показывает план.
-
-Альтернативы:
-
-- `npx skills add <owner>/<repo> --skill python-style` — тот же формат, без клонирования.
-- Чтобы скиллы получили коллеги по проекту, ставьте с `--copy` и коммитьте копии в репозиторий проекта: симлинки указывают на путь на вашей машине.
-
-## Почему профили, а не «всё сразу»
-
-`name` + `description` каждого установленного скилла лежат в контексте агента на каждом запросе. Python-скиллы в TypeScript-проекте — это токены впустую и ложные срабатывания. Глобально — только то, что нужно везде (`everyone`); языки и стек — в проект.
-
-## Новый скилл
+Без клонирования, через npm (тот же формат):
 
 ```bash
-python3 scripts/new_skill.py lang go-style
+npx skills add hBdish/skills --skill go-style
 ```
 
-Дальше: написать `description`, тело, евалы, добавить в `profiles.json`, прогнать валидатор:
+## Обновление и удаление
+
+Обновиться:
 
 ```bash
-python3 scripts/validate.py --strict
+git -C ~/skills pull
 ```
 
-Как писать — в [skills/meta/skill-authoring/SKILL.md](skills/meta/skill-authoring/SKILL.md) (этот же скилл агент использует, когда вы просите его сделать скилл). Коротко:
+Ссылки обновятся во всех проектах сразу. Если ставили с `--copy`, повторите `install.py` с теми же параметрами.
 
-1. **Один скилл — одна задача.** Если `description` описывает две — это два скилла.
-2. **`description` отвечает за срабатывание**: что делает → «Use when …» с реальными формулировками и типами файлов → «Do NOT use for …» с соседями по имени. 300–700 символов, главное — в первых 150.
-3. **Progressive disclosure**: `SKILL.md` — процедура до 500 строк; детали в `references/` с явным «читай X, когда Y»; вычислимое — в `scripts/`.
-4. **Правила проекта главнее скилла**: конфиги линтеров и окружающий код решают, скилл заполняет пробелы.
-5. **Объяснять «почему»**, а MUST оставлять только для того, что ломает результат.
-6. **Переносимость**: только поля из спецификации, относительные ссылки внутри скилла, скрипты на Python stdlib, без названий инструментов конкретного агента.
-7. **Две оценки**: срабатывание (`trigger-evals.json`, ~20 запросов с near-miss негативами) и качество (`evals.json`, с скиллом против без).
-8. **Изменение `description` — breaking change**: перепрогнать евалы свои и соседей.
+Удалить из проекта (удаляет только то, что поставил скрипт):
 
-## CI
+```bash
+python3 ~/skills/scripts/install.py --profile react --uninstall
+```
 
-`.github/workflows/ci.yml` гоняет валидатор и установку в обоих режимах на Ubuntu, macOS и Windows.
+## Если не работает
+
+**Агент не видит скилл.**
+- Перезапустите агента: каталог скиллов читается при старте.
+- Проверьте, что ставили в нужный проект: `ls .agents/skills .claude/skills`.
+- Ваш агент читает другой каталог — поставьте с `--agent` (список — `--list`) или с `--agents-md`.
+
+**Скилл есть, но не срабатывает.**
+- Вызовите явно (`/go-style` в Claude Code, `$go-style` в Codex) или напишите «используй go-style».
+- Если не срабатывает на типичный запрос, это баг описания скилла. Заведите issue с текстом запроса.
+
+**Срабатывает не тот скилл** (например, python-style на TS-файл) — тоже issue с текстом запроса.
+
+**В выводе проверок `SKIP`.** Инструмент не установлен, и эта часть кода не проверена. Поставьте его:
+
+| Скилл | Инструменты |
+|---|---|
+| go-style | `go install golang.org/x/tools/cmd/goimports@latest`, `go install honnef.co/go/tools/cmd/staticcheck@latest`, [golangci-lint](https://golangci-lint.run/welcome/install/) |
+| react-style, typescript-style | `npm install` в проекте: используются tsc, eslint, prettier/biome из `node_modules` проекта |
+| python-style | `pip install ruff mypy` (или `uv tool install ruff`) |
+
+**Windows: `python3` не найден.** Используйте `py` или `python`.
+
+**Windows: скилл поставился копией, а не ссылкой.** Значит, не удалось ни создать symlink, ни junction. Всё работает, только после `git pull` нужно повторить `install.py`. Чтобы были ссылки, включите Developer Mode: Settings → System → For developers.
+
+**`exists and was not installed from this repo; skipped`.** В проекте уже есть свой скилл с таким именем. Скрипт его не трогает; заменить можно флагом `--force`.
+
+## Добавить или изменить скилл
+
+См. [CONTRIBUTING.md](CONTRIBUTING.md). Коротко: `python3 scripts/new_skill.py <группа> <имя>`, заполнить по шаблону, `python3 scripts/validate.py --strict`, PR. Можно попросить агента: при установленном профиле `authors` он сделает это по правилам репозитория.
