@@ -1,0 +1,7 @@
+# LF everywhere: CRLF in SKILL.md frontmatter breaks some agents' parsers,
+# and a CRLF shebang breaks scripts on macOS/Linux.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary

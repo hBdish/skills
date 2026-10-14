@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        # 3.9 is the macOS system python3; scripts must keep working there.
+        python: ["3.9", "3.13"]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Validate skills
+        run: python scripts/validate.py --strict
+
+      - name: Install with links into a clean project
+        run: |
+          proj="$RUNNER_TEMP/proj-link" && mkdir -p "$proj"
+          python scripts/install.py --profile fullstack --project "$proj" --agents-md
+          test -f "$proj/.agents/skills/python-style/SKILL.md"
+          test -f "$proj/.claude/skills/typescript-style/SKILL.md"
+          grep -q 'python-style' "$proj/AGENTS.md"
+          python scripts/install.py --profile fullstack --project "$proj" --agents-md --uninstall
+          test ! -e "$proj/.agents/skills/python-style"
+          test ! -e "$proj/.claude/skills/typescript-style"
+          ! grep -q 'skills:start' "$proj/AGENTS.md"
+
+      - name: Install with copies into a clean project
+        run: |
+          proj="$RUNNER_TEMP/proj-copy" && mkdir -p "$proj"
+          python scripts/install.py --profile python --project "$proj" --copy
+          test -f "$proj/.agents/skills/python-style/scripts/check.py"
+          test ! -e "$proj/.agents/skills/python-style/evals"
+          python scripts/install.py --profile python --project "$proj" --uninstall
+          test ! -e "$proj/.agents/skills/python-style"
+
+      - name: Install without a profile fails
+        run: "! python scripts/install.py --project \"$RUNNER_TEMP\""
+
+      - name: Skill scripts run and report missing tools
+        run: |
+          cd skills/lang/python-style/evals/files
+          python ../../scripts/check.py clean.py
+
+      - name: React conventions are read from the project
+        run: |
+          out="$(python skills/framework/react-style/scripts/conventions.py skills/framework/react-style/evals/files/shop-app)"
+          echo "$out"
+          echo "$out" | grep -q 'AGENTS.md'
+          echo "$out" | grep -q 'styling: styled-components'
+          echo "$out" | grep -q 'exports: default export'
+          echo "$out" | grep -q 'file naming: kebab-case folder/index'

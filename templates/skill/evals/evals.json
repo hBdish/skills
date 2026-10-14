@@ -1,0 +1,18 @@
+{
+  "skill_name": "__NAME__",
+  "method": "Run each case with the skill and without it (same model, same prompt), 3 runs each. Keep only expectations that fail without the skill.",
+  "evals": [
+    {
+      "id": "__case-id__",
+      "prompt": "__task as a user would phrase it__",
+      "files": [],
+      "expectations": ["__observable property of a good answer__"]
+    },
+    {
+      "id": "clean-input",
+      "prompt": "__same task on input that is already fine__",
+      "files": [],
+      "expectations": ["Reports no real problems and does not invent any"]
+    }
+  ]
+}

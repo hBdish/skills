@@ -1,0 +1,28 @@
+{
+  "$comment": "Profiles are the unit of installation: install.py --profile <name>. Keep each profile small (<= 8 skills): every installed description is in the agent's context on every request. 'everyone' is meant for --global; put language and stack skills into project profiles.",
+  "profiles": {
+    "everyone": [],
+    "authors": [
+      "skill-authoring"
+    ],
+    "go": [
+      "go-style"
+    ],
+    "python": [
+      "python-style"
+    ],
+    "typescript": [
+      "typescript-style"
+    ],
+    "react": [
+      "react-style",
+      "typescript-style"
+    ],
+    "fullstack": [
+      "go-style",
+      "python-style",
+      "react-style",
+      "typescript-style"
+    ]
+  }
+}

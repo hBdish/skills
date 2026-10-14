@@ -1,0 +1,37 @@
+{
+  "skill_name": "python-style",
+  "method": "Run each case with the skill and without it (same model, same prompt), 3 runs each. The skill is justified only if it beats the baseline consistently. Record time and output tokens too.",
+  "evals": [
+    {
+      "id": "review-service",
+      "prompt": "Review this before I open the PR.",
+      "files": ["evals/files/service.py"],
+      "expectations": [
+        "Leads with correctness: the mutable default `seen=[]`, the file opened without `with`, and `assert path` used to validate input",
+        "Flags `except Exception: pass` in refresh() as swallowing errors and proposes a narrow catch or logger.exception",
+        "Rewrites the f-string logging call as a lazy pattern: logger.info(\"loaded %d rows from %s\", ...)",
+        "Flags `name: str = None` as an implicit Optional",
+        "Uses the [severity] path:LINE format from SKILL.md and ends with a list of checks not run",
+        "Does not claim ruff or mypy ran unless it actually ran scripts/check.py"
+      ]
+    },
+    {
+      "id": "clean-input",
+      "prompt": "Anything to improve here?",
+      "files": ["evals/files/clean.py"],
+      "expectations": [
+        "Reports no high or medium findings",
+        "Does not invent problems to fill the review; at most optional low-severity notes, clearly marked optional"
+      ]
+    },
+    {
+      "id": "respects-project-config",
+      "prompt": "Write a function in this project that parses an ISO date string or returns None.",
+      "files": ["evals/files/pyproject.toml"],
+      "expectations": [
+        "Uses Optional[...] / typing syntax compatible with requires-python = \">=3.8\" (no `X | None` in runtime annotations, no `match`)",
+        "Annotates the public function and documents the None case"
+      ]
+    }
+  ]
+}

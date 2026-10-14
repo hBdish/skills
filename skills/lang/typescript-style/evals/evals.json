@@ -1,0 +1,24 @@
+{
+  "skill_name": "typescript-style",
+  "method": "Run each case with the skill and without it (same model, same prompt), 3 runs each. The skill is justified only if it beats the baseline consistently.",
+  "evals": [
+    {
+      "id": "api-parse",
+      "prompt": "Write a TypeScript function that fetches /api/user/:id and returns the user or an error the caller can switch on.",
+      "files": [],
+      "expectations": [
+        "Returns a discriminated union (status/kind field), not optional data/error fields",
+        "Treats the response body as unknown and validates or narrows it before use; no `as User` on the JSON",
+        "Has an explicit return type; no `any`, no non-null assertions"
+      ]
+    },
+    {
+      "id": "clean-input",
+      "prompt": "Anything to improve here? export function sum(xs: readonly number[]): number { return xs.reduce((a, b) => a + b, 0); }",
+      "files": [],
+      "expectations": [
+        "Reports no high or medium findings and does not invent problems"
+      ]
+    }
+  ]
+}

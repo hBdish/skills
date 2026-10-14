@@ -1,0 +1,22 @@
+[
+  {"query": "глянь перед PR: func (s *Service) Process(amt float64) (*Receipt, error) { if amt <= 0 { return nil, errors.New(\"Invalid amount!\") } }", "should_trigger": true, "note": "review of Go code, core case"},
+  {"query": "это идиоматично? в пакете sqldb лежит тип DBConnection с методом GetConnectionString()", "should_trigger": true, "note": "repetition + Get prefix + initialisms"},
+  {"query": "ревьюер написал \"exit condition?\" на мою горутину с тикером, что он имеет в виду", "should_trigger": true, "note": "review comment, no code attached"},
+  {"query": "как назвать пакет, который читает и валидирует конфиги сервиса", "should_trigger": true, "note": "package naming"},
+  {"query": "нужно тут %w или хватит %v: ошибка из драйвера pgx уходит наверх в хендлер", "should_trigger": true, "note": "wrap decision"},
+  {"query": "перепиши эти три теста в табличный вид, они отличаются только входом", "should_trigger": true, "note": "table-driven tests"},
+  {"query": "напиши на go функцию, которая читает csv по частям и отдаёт строки в канал", "should_trigger": true, "note": "generation: style applies to code we write too"},
+  {"query": "у меня в одном типе ресивер то b, то board, то self — это важно?", "should_trigger": true, "note": "receiver consistency"},
+  {"query": "почему советуют не возвращать интерфейс из конструктора в go", "should_trigger": true, "note": "interface design, no code"},
+  {"query": "вот кусок из моего PR на го, скажи это Google style или нет", "should_trigger": true, "note": "explicit ask for Google style"},
+  {"query": "настрой github actions, чтобы на каждый PR гонялся golangci-lint и go test с race", "should_trigger": false, "note": "near-miss: Go linter lexicon, task is CI plumbing"},
+  {"query": "у нас 40% покрытия по сервису, что дописывать в первую очередь", "should_trigger": false, "note": "near-miss: tests, but coverage strategy"},
+  {"query": "стоит ли выносить биллинг в отдельный сервис или оставить модулем в монолите", "should_trigger": false, "note": "near-miss: same Go codebase, architecture decision"},
+  {"query": "в питоновском сервисе переменные то camelCase то snake_case, приведи к единому виду", "should_trigger": false, "note": "near-miss: identical naming task, wrong language"},
+  {"query": "не трогай стиль, у нас фриз. найди, почему race detector ругается на map в handleUpdate", "should_trigger": false, "note": "explicit opt-out inside a Go task"},
+  {"query": "подними зависимость до v2, разберись с replace в go.mod и почему go mod tidy её выкидывает", "should_trigger": false, "note": "near-miss: Go, but module tooling"},
+  {"query": "go build падает с undefined: NewClient после мержа мастера, помоги починить", "should_trigger": false, "note": "near-miss: Go build failure, not style"},
+  {"query": "как выставить GOMAXPROCS и настроить GC в контейнере с лимитом 2 CPU", "should_trigger": false, "note": "near-miss: Go runtime tuning, out of bounds"},
+  {"query": "чем go отличается от rust по управлению памятью, для доклада", "should_trigger": false, "note": "near-miss: language comparison with no code under discussion"},
+  {"query": "оформи описание PR по нашему шаблону для этого изменения в go-сервисе", "should_trigger": false, "note": "near-miss: review lexicon and Go, but delivery"}
+]

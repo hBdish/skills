@@ -1,0 +1,69 @@
+{
+  "skill_name": "go-style",
+  "method": "paired",
+  "comment": "Each case runs with the skill loaded and without it, same model and prompt. The skill is justified only if it beats baseline consistently. An expectation that also passes at baseline discriminates nothing and must be rewritten.",
+  "baseline": {"kind": "no-skill", "note": "From the next version on, baseline is a snapshot of the previous one, so these double as regression tests."},
+  "runs_per_case": 3,
+  "scoring": {
+    "pass": "every expectation with required=true holds in a majority of runs",
+    "also_record": ["wall_clock_seconds", "output_tokens"],
+    "note": "Time and tokens are part of the result: one extra finding for triple the output is not obviously better."
+  },
+  "evals": [
+    {
+      "id": "review-handler",
+      "prompt": "Review this before I open the PR.",
+      "files": ["evals/files/handler.go"],
+      "expectations": [
+        {"id": "safety-first", "required": true, "assert": "Leads with the safety defects, not the naming ones: math/rand for a token (decisions 6.4) and the fire-and-forget goroutine with no exit condition (decisions 5.9)."},
+        {"id": "nil-interface", "required": true, "assert": "Flags Validate returning *ValidationError instead of error, and explains the nil-interface trap: the returned value is non-nil as an interface even when the pointer is nil (decisions 4.1)."},
+        {"id": "in-band", "required": true, "assert": "Flags LookupAge returning -1 as an in-band error and proposes (int, error) or (int, bool) (decisions 4.4)."},
+        {"id": "ctx-field", "required": true, "assert": "Flags context.Context stored as a struct field rather than passed as the first parameter (decisions 6.3)."},
+        {"id": "receiver", "required": true, "assert": "Flags the self receiver on Validate as both a banned name and inconsistent with h elsewhere on the type (decisions 1.3)."},
+        {"id": "getter-initialism", "required": true, "assert": "Flags GetUserId on two counts: the Get prefix (decisions 1.6) and the Id initialism, which should be UserID (decisions 1.5)."},
+        {"id": "underscore", "required": false, "assert": "Flags max_age for the underscore (decisions 1.1)."},
+        {"id": "error-strings", "required": true, "assert": "Flags \"Save incomplete!\" and \"Invalid field: \" for capitalisation and punctuation (decisions 4.2), and fmt.Errorf(\"failed: %v\", err) as an empty annotation that should just return err (best-practices 4.2)."},
+        {"id": "any", "required": false, "assert": "Flags interface{} in favour of any (decisions 5.18)."},
+        {"id": "no-fabrication", "required": true, "assert": "Does not claim the file fails gofmt or goimports: it is gofmt -s clean. Inventing mechanical findings is a hard fail."},
+        {"id": "format", "required": true, "assert": "Uses the severity/current/fix/why block from SKILL.md, ordered safety before clarity before nits."}
+      ]
+    },
+    {
+      "id": "review-tests",
+      "prompt": "Anything wrong with these tests?",
+      "files": ["evals/files/handler_test.go"],
+      "expectations": [
+        {"id": "fatal-goroutine", "required": true, "assert": "Leads with t.Fatal called from a non-test goroutine and proposes t.Error plus return (best-practices 8.6)."},
+        {"id": "failure-messages", "required": true, "assert": "Flags t.Error(\"failed\") and t.Errorf(\"wrong error\") for naming neither the function, the input, nor got and want (decisions 7.2, 7.3, 7.4)."},
+        {"id": "error-string-compare", "required": true, "assert": "Flags comparing err.Error() against a literal and proposes errors.Is/errors.As or cmpopts.EquateErrors (decisions 7.11)."},
+        {"id": "table", "required": true, "assert": "Proposes collapsing TestValidateEmpty and TestValidateOk into one table-driven test with a name field (decisions 8.2)."},
+        {"id": "helper", "required": true, "assert": "Flags newHandler for not calling t.Helper() (decisions 8.3)."}
+      ]
+    },
+    {
+      "id": "layer-precedence",
+      "prompt": "best-practices says to wrap with %w at the end of the message, but gofmt keeps reformatting my error line and our package does it the other way everywhere. Who wins?",
+      "expectations": [
+        {"id": "gofmt-top", "required": true, "assert": "States that gofmt outranks all three layers on anything mechanical."},
+        {"id": "layers", "required": true, "assert": "Ranks correctly: the five principles override decisions, decisions override best-practices, and local consistency is the weakest tiebreaker."},
+        {"id": "consistency-limit", "required": false, "assert": "Notes that local consistency is not a defence when it would spread the deviation further."}
+      ]
+    },
+    {
+      "id": "silence-is-an-answer",
+      "prompt": "Should I write `var i int` or `i := 0` here? And `&File{}` or `new(File)`?",
+      "expectations": [
+        {"id": "non-decision", "required": true, "assert": "States that the guide is deliberately silent on both and that neither should be raised as a review finding."},
+        {"id": "no-invention", "required": true, "assert": "Does not fabricate a preference or attribute one to Google."}
+      ]
+    },
+    {
+      "id": "opt-out-respected",
+      "prompt": "Don't worry about style, just make it work: why does this handler drop every second request?",
+      "expectations": [
+        {"id": "no-style-list", "required": true, "assert": "Produces no style findings list."},
+        {"id": "answers", "required": true, "assert": "Answers the correctness question, and may note a genuine bug without stylistic commentary."}
+      ]
+    }
+  ]
+}

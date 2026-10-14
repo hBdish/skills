@@ -1,0 +1,22 @@
+[
+  {"query": "хочу сделать скилл, который ревьюит миграции postgres", "should_trigger": true, "note": "new skill"},
+  {"query": "мой скилл python-style не срабатывает, когда прошу написать код", "should_trigger": true, "note": "under-triggering"},
+  {"query": "я каждый раз копирую один и тот же промпт для релиз-нотов, можно это оформить нормально?", "should_trigger": true, "note": "prompt -> skill, no word 'skill'"},
+  {"query": "review this SKILL.md, the description feels too vague", "should_trigger": true, "note": "English review"},
+  {"query": "разбей go-style на два скилла или оставь одним?", "should_trigger": true, "note": "split/merge decision"},
+  {"query": "как написать trigger evals для скилла", "should_trigger": true, "note": "evals"},
+  {"query": "скилл работает в claude, но cursor его не видит", "should_trigger": true, "note": "portability"},
+  {"query": "куда положить длинную таблицу правил: в SKILL.md или в references", "should_trigger": true, "note": "progressive disclosure"},
+  {"query": "напиши скрипт проверки для скилла, чтобы работал и на windows", "should_trigger": true, "note": "scripts portability"},
+  {"query": "этот скилл срабатывает на всё подряд, даже на вопросы про CI", "should_trigger": true, "note": "over-triggering"},
+  {"query": "напиши AGENTS.md для нашего сервиса", "should_trigger": false, "note": "near-miss: project instructions, not a skill"},
+  {"query": "отревьюй этот python-файл", "should_trigger": false, "note": "near-miss: uses a skill (python-style), doesn't author one"},
+  {"query": "поставь скиллы в проект ../api", "should_trigger": false, "note": "near-miss: installation, not authoring"},
+  {"query": "какие у меня установлены скиллы?", "should_trigger": false, "note": "near-miss: listing"},
+  {"query": "напиши промпт для чат-бота поддержки", "should_trigger": false, "note": "near-miss: prompt engineering for a product"},
+  {"query": "настрой MCP-сервер для postgres", "should_trigger": false, "note": "near-miss: tooling config"},
+  {"query": "заведи slash-команду /deploy в claude code", "should_trigger": false, "note": "near-miss: agent-specific command"},
+  {"query": "сделай CLAUDE.md с правилами коммитов", "should_trigger": false, "note": "near-miss: project memory file"},
+  {"query": "объясни, как работает tool calling у LLM", "should_trigger": false, "note": "near-miss: general explanation"},
+  {"query": "обнови зависимости в requirements.txt", "should_trigger": false, "note": "unrelated with shared 'update' vocabulary"}
+]

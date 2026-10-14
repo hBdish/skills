@@ -1,0 +1,22 @@
+[
+  {"query": "сделай компонент карточки товара с кнопкой «в корзину»", "should_trigger": true, "note": "new component; must follow project conventions"},
+  {"query": "глянь UserList.tsx перед мержем", "should_trigger": true, "note": "review of a .tsx component"},
+  {"query": "почему useEffect уходит в бесконечный цикл, вот код", "should_trigger": true, "note": "effects bug"},
+  {"query": "вынеси логику пагинации из компонента в хук", "should_trigger": true, "note": "custom hook extraction"},
+  {"query": "add a modal for confirming delete to the settings page (it's a jsx file)", "should_trigger": true, "note": "English, plain JS React"},
+  {"query": "нужен ли тут useMemo или это лишнее", "should_trigger": true, "note": "memoisation decision"},
+  {"query": "перепиши этот классовый компонент на функциональный", "should_trigger": true, "note": "class -> function"},
+  {"query": "напиши тест на компонент формы логина", "should_trigger": true, "note": "component test with Testing Library"},
+  {"query": "в next.js странице нужен 'use client' или нет?", "should_trigger": true, "note": "RSC boundary"},
+  {"query": "key={index} в списке — это проблема?", "should_trigger": true, "note": "keys"},
+  {"query": "как типизировать generic-функцию groupBy в utils.ts", "should_trigger": false, "note": "near-miss: TS typing outside components (typescript-style)"},
+  {"query": "vite собирает бандл 4 мегабайта, как распилить чанки", "should_trigger": false, "note": "near-miss: bundler config"},
+  {"query": "настрой eslint flat config для монорепы", "should_trigger": false, "note": "near-miss: lint tooling setup"},
+  {"query": "перепиши этот компонент с vue 2 на vue 3 composition api", "should_trigger": false, "note": "near-miss: other UI framework"},
+  {"query": "на express-сервере эндпоинт /api/cart отдаёт 500", "should_trigger": false, "note": "near-miss: JS backend, not React"},
+  {"query": "обнови react с 18 до 19 во всех пакетах монорепы и почини lock-файл", "should_trigger": false, "note": "near-miss: dependency upgrade mechanics"},
+  {"query": "какой стейт-менеджер выбрать для нового проекта, сравни", "should_trigger": false, "note": "near-miss: technology choice without code"},
+  {"query": "не трогай стиль, просто найди почему падает сборка на CI", "should_trigger": false, "note": "explicit opt-out, build failure"},
+  {"query": "сверстай лендинг на чистом html и css", "should_trigger": false, "note": "near-miss: UI, but no React"},
+  {"query": "напиши e2e-сценарий в playwright для оформления заказа", "should_trigger": false, "note": "near-miss: e2e, not component code"}
+]

@@ -1,0 +1,47 @@
+{
+  "skill_name": "react-style",
+  "method": "Run each case with the skill and without it (same model, same prompt), 3 runs each. The fixture's conventions deliberately differ from the skill's defaults: passing means the project won.",
+  "evals": [
+    {
+      "id": "new-component-follows-project",
+      "prompt": "Add a QuantityStepper component (minus / count / plus) with a test.",
+      "files": ["evals/files/shop-app"],
+      "expectations": [
+        "Reads AGENTS.md (or runs scripts/conventions.py) before writing code and says which convention sources it used",
+        "Creates src/components/quantity-stepper/index.tsx and styles.ts (kebab-case folder + index, styles next to it)",
+        "Arrow-function component with a default export and `interface QuantityStepperProps`",
+        "Styles with styled-components only: no inline style, no CSS file, no Tailwind",
+        "Test at src/components/__tests__/quantity-stepper.test.tsx using Testing Library role queries and user-event with Vitest",
+        "Follows .prettierrc: no semicolons, single quotes",
+        "Uses <button type=\"button\"> with accessible names for minus/plus"
+      ]
+    },
+    {
+      "id": "effect-misuse-review",
+      "prompt": "Review this component: function Total({ items }) { const [total, setTotal] = useState(0); useEffect(() => { setTotal(items.reduce((s, i) => s + i.price, 0)) }, [items]); return <p>{total}</p> }",
+      "files": [],
+      "expectations": [
+        "Flags the effect as derived state and replaces it with a value computed during render",
+        "Does not recommend useMemo as the primary fix unless it justifies the cost"
+      ]
+    },
+    {
+      "id": "shared-state-respects-store",
+      "prompt": "The cart count should also show in the header. Wire it up.",
+      "files": ["evals/files/shop-app"],
+      "expectations": [
+        "Uses the existing zustand store (useCartStore) instead of creating a React Context or prop drilling",
+        "Does not add a new state library"
+      ]
+    },
+    {
+      "id": "clean-input",
+      "prompt": "Anything to improve in src/components/product-card/index.tsx?",
+      "files": ["evals/files/shop-app"],
+      "expectations": [
+        "Does not flag the default export, arrow function or interface props: they are the project's conventions",
+        "Reports no high or medium findings and does not invent problems"
+      ]
+    }
+  ]
+}

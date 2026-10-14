@@ -1,0 +1,22 @@
+[
+  {"query": "глянь перед PR: def add_tag(item, tags=[]): tags.append(item.name); return tags", "should_trigger": true, "note": "review, mutable default: core case"},
+  {"query": "напиши на питоне функцию, которая читает csv кусками и отдаёт строки генератором", "should_trigger": true, "note": "generation: style applies to code we write"},
+  {"query": "logging.info(f\"user {uid} not found\") — коллега говорит так нельзя, почему", "should_trigger": true, "note": "lazy logging"},
+  {"query": "Optional[str] или str | None, и что делать с def f(a: str = None)", "should_trigger": true, "note": "typing question without code file"},
+  {"query": "можно ли ловить except Exception вокруг всего хендлера, чтобы воркер не падал", "should_trigger": true, "note": "broad except at isolation boundary"},
+  {"query": "refactor this class, it's 400 lines and does everything (user_service.py)", "should_trigger": true, "note": "English, refactor of a .py file"},
+  {"query": "is this pythonic? for i in range(len(items)): print(items[i])", "should_trigger": true, "note": "direct style question"},
+  {"query": "dataclass или pydantic для конфига, который читаем из env", "should_trigger": true, "note": "container choice, references/typing.md"},
+  {"query": "добавь тайп-хинты в utils.py, mypy ругается", "should_trigger": true, "note": "typing task on a file"},
+  {"query": "перепиши этот скрипт на pathlib вместо os.path", "should_trigger": true, "note": "idiom modernisation"},
+  {"query": "разрули конфликт версий в poetry.lock, pydantic тянет несовместимый typing-extensions", "should_trigger": false, "note": "near-miss: Python, but dependency resolution"},
+  {"query": "настрой github actions, чтобы на каждый PR гонялись pytest и ruff", "should_trigger": false, "note": "near-miss: linter lexicon, task is CI"},
+  {"query": "в этом ts-файле функции то camelCase, то snake_case — приведи к одному", "should_trigger": false, "note": "near-miss: naming task, wrong language (typescript-style)"},
+  {"query": "у нас 55% покрытия по питоновскому сервису, что дописывать в первую очередь", "should_trigger": false, "note": "near-miss: test strategy, not style"},
+  {"query": "не трогай стиль, у нас фриз. найди, почему celery-воркер обрабатывает сообщение дважды", "should_trigger": false, "note": "explicit opt-out inside a Python task"},
+  {"query": "этот запрос в django orm делает N+1, перепиши через select_related", "should_trigger": false, "note": "near-miss: framework performance"},
+  {"query": "собери wheel и выложи пакет во внутренний pypi", "should_trigger": false, "note": "near-miss: packaging"},
+  {"query": "чем python отличается от go по конкурентности, готовлю доклад", "should_trigger": false, "note": "near-miss: comparison, no code"},
+  {"query": "агрегация в pandas на 10 млн строк занимает 4 минуты, как ускорить", "should_trigger": false, "note": "near-miss: performance"},
+  {"query": "оформи README для нашей питоновской библиотеки", "should_trigger": false, "note": "near-miss: Markdown doc in a Python project"}
+]

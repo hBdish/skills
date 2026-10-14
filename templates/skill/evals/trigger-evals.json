@@ -1,0 +1,4 @@
+[
+  {"query": "__realistic request that should trigger__", "should_trigger": true, "note": "__why__"},
+  {"query": "__near-miss: same words, different task__", "should_trigger": false, "note": "__which skill owns it__"}
+]

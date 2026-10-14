@@ -1,0 +1,22 @@
+[
+  {"query": "глянь хук useUser.ts перед мержем, там any в трёх местах", "should_trigger": true, "note": "review of .ts, any"},
+  {"query": "напиши функцию на ts, которая парсит ответ API и возвращает либо данные, либо ошибку", "should_trigger": true, "note": "generation, discriminated union"},
+  {"query": "enum или union строк для статусов заказа?", "should_trigger": true, "note": "typing question without code"},
+  {"query": "почему eslint ругается no-floating-promises на этот вызов", "should_trigger": true, "note": "async error handling"},
+  {"query": "data!.user!.name — так норм или лучше переписать?", "should_trigger": true, "note": "non-null assertion"},
+  {"query": "refactor this React component props typing, it's a mess of optional fields", "should_trigger": true, "note": "English, .tsx typing"},
+  {"query": "как правильно типизировать catch (e) в typescript", "should_trigger": true, "note": "unknown in catch"},
+  {"query": "value || 'default' или value ?? 'default'", "should_trigger": true, "note": "nullish coalescing"},
+  {"query": "добавь типы в этот js-файл, переводим проект на ts", "should_trigger": true, "note": "migration to TS"},
+  {"query": "interface или type для пропсов компонента?", "should_trigger": true, "note": "project-convention question"},
+  {"query": "vite собирает бандл 4 мегабайта, как распилить чанки", "should_trigger": false, "note": "near-miss: bundler config"},
+  {"query": "какие опции tsconfig включить для монорепы с project references", "should_trigger": false, "note": "near-miss: tsconfig tuning"},
+  {"query": "в python-модуле функции то camelCase, то snake_case — приведи к одному", "should_trigger": false, "note": "near-miss: naming, wrong language (python-style)"},
+  {"query": "настрой github actions, чтобы гонять tsc и eslint на PR", "should_trigger": false, "note": "near-miss: CI"},
+  {"query": "почему useEffect вызывается дважды в dev-режиме", "should_trigger": false, "note": "near-miss: React behaviour, not typing"},
+  {"query": "не трогай стиль, найди почему websocket отваливается через минуту", "should_trigger": false, "note": "explicit opt-out"},
+  {"query": "обнови next.js с 14 на 15, что сломается", "should_trigger": false, "note": "near-miss: framework upgrade"},
+  {"query": "npm install падает с ERESOLVE peer dependency", "should_trigger": false, "note": "near-miss: dependencies"},
+  {"query": "напиши README для нашей ts-библиотеки", "should_trigger": false, "note": "near-miss: docs"},
+  {"query": "сравни deno и bun для нового сервиса", "should_trigger": false, "note": "near-miss: runtime choice"}
+]
